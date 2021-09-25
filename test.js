@@ -1,9 +1,18 @@
-const date = new Date();
-const hours = date.getHours();
-const minutes =
-  date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-const seconds = date.getSeconds();
+const puppeteer = require('puppeteer');
 
-const current = `${hours}:${minutes}:${seconds}`;
+(async () => {
+  const sites = [
+    'https://www.facebook.com/',
+    'https://www.instagram.com/?hl=en',
+    'https://sequelize.org/',
+    'https://github.com/',
+    'https://medium.com/',
+  ];
 
-console.log(current);
+  const browser = await puppeteer.launch({ headless: false });
+
+  sites.forEach(async (site) => {
+    const newPage = await browser.newPage();
+    await newPage.goto(site);
+  });
+})().catch((err) => console.error(err));
