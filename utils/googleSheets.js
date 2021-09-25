@@ -1,6 +1,7 @@
 const { google } = require('googleapis');
 
 const googleSheetsFiller = async (page) => {
+  // Authenticating to the google sheet
   const auth = new google.auth.GoogleAuth({
     keyFile: 'credentials.json',
     scopes: 'https://www.googleapis.com/auth/spreadsheets',
@@ -36,7 +37,7 @@ const googleSheetsFiller = async (page) => {
 
   let dataArr = newSheetsData[random];
 
-  //   Waiting for the selectors untill they pop up in the page
+  // Waiting for the selectors untill they pop up in the page
   const waitingForSelectors = async (arr) => {
     for (let i = 0; i < arr.length; i++) {
       await page.waitForSelector(arr[i]);

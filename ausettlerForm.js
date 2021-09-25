@@ -4,11 +4,11 @@ const Views = require('./models/views');
 const db = require('./db/mongoose');
 const viewsReset = require('./utils/viewsReset');
 const googleSheetsFiller = require('./utils/googleSheets');
-const fvisionCheck = require('./utils/fvisionCheck');
+// const fvisionCheck = require('./utils/fvisionCheck');
 const openSites = require('./utils/multipleSites');
+// const pageSettings = require('./utils/pageSettings');
 const current = require('./utils/currentTime');
 const pageView = require('./utils/pageView');
-const fvisionCheck = require('./utils/fvisionCheck');
 require('dotenv').config();
 
 (async () => {
@@ -20,7 +20,7 @@ require('dotenv').config();
   db();
 
   // Getting the proxy details @ ./utils/proxy.js
-  const { host, port, username, password } = await proxyDetails(proxyFile);
+  // const { host, port, username, password } = await proxyDetails(proxyFile);
 
   // Checking the proxy at the f.vision site and changing the peoxy of the request
   const browser = await puppeteer.launch({
@@ -33,14 +33,10 @@ require('dotenv').config();
   // Creating a new page
   const page = await browser.newPage();
 
-  page.setDefaultNavigationTimeout(0);
+  // Applying the bot settings when we are sending a request with the bot @ ./utils/pageSettings.js
+  // await pageSettings(page, username, password);
 
-  await page.setViewport({ width: 1536, height: 864 }); // Changing the resolution of the chrome tab
-
-  // Proxy authentication
-  // page.authenticate({ username, password });
-
-  // Navigating to the f.vision site to check if there is any proxy error, and if there is we exit the bot and if there is no proxy error we proceed with the form filler bot
+  // Navigating to the f.vision site to check if there is any proxy error, and if there is we exit the bot and if there is no proxy error we proceed with the form filler bot @ ./utils/fvisionCheck.js
   // await fvisionCheck(page);
 
   // Condition that handles the deletion of the views document and inserts at 12AM the summary of the views

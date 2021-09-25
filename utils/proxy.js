@@ -13,10 +13,12 @@ const proxyDetails = async (fileName) => {
   const proxyFileData = await readProxyFilePromise(fileName);
   const proxyArr = proxyFileData.toString().split('\n');
 
+  // Picking a random proxy and splitting it by :
   let randomProxy = getRandomProxy(proxyArr);
   proxyArr.filter((proxy) => proxy !== randomProxy);
   randomProxy = randomProxy.split(':');
 
+  // Getting all the data that we need for one proxy into one object
   const proxyDetails = {
     host: randomProxy[0],
     port: randomProxy[1],

@@ -5,13 +5,14 @@ const fvisionCheck = async (page) => {
 
   await page.waitForSelector('.danger');
 
+  // Getting the className that popped up in the proxy field
   const el = await page.$('[data-func="anonymizer_type"]');
   const className = await (await el.getProperty('className')).jsonValue();
 
   // Navigating to the liberty site
   className == 'col-sm-6 col-xs-6 nav-link nav-parts danger'
     ? process.exit(1)
-    : await page.goto('https://www.libertyhomeguard.com/', {
+    : await page.goto('http://ausettler.com/test/form.php', {
         waitUntil: 'networkidle2',
       });
 };

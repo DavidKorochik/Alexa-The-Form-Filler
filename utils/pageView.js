@@ -1,3 +1,4 @@
+// Creating another bot that will send 8 more requests to the form that we are filling so that "8 more people" will watch the form filler bot
 const pageView = async (browser) => {
   for (let i = 1; i < 9; i++) {
     let pageToView = await browser.newPage();
