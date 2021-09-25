@@ -1,51 +1,43 @@
 const puppeteer = require('puppeteer');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
 const cerd = require('./config/artyom-david-project-67666103291e.json');
-const proxyDetails = require('./utils/proxy');
+
+// const proxyDetails = require('./utils/proxy');
 
 (async () => {
   const zip = '77584';
-
-  const { host, port, username, password } = await proxyDetails(
-    'vips-residential-updated.txt'
-  );
+  let handler = false;
 
   // Checking the proxy at the f.vision site and changing the peoxy of the request
   const browser = await puppeteer.launch({
     executablePath:
       'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
     headless: false,
-    args: [`--proxy-server=http://${host}:${port}`],
   });
 
   const page = await browser.newPage();
 
-  await page.authenticate({ username, password });
-
   page.setDefaultNavigationTimeout(0);
 
-  await page.setViewport({ width: 1536, height: 864 });
+  // let count = 0; // Count the number of entries to the site in a day
 
-  await page.goto('http://f.vision/');
+  const pageView = async () => {
+    for (let i = 1; i < 9; i++) {
+      let pageToView = await browser.newPage();
+      await pageToView.goto('http://ausettler.com/test/form.php');
+      setTimeout(async () => {
+        await browser.close();
+      }, 30000);
+    }
+    handler = true;
+  };
 
-  // await page.emulateTimezone('America/Louisville');
+  await pageView();
 
-  await page.$eval('#start-button', (submit) => submit.click());
+  await page.goto('http://ausettler.com/test/form.php');
 
-  await page.waitForSelector('.danger');
+  await page.type('#zipcode', zip);
 
-  const el = await page.$('[data-func="anonymizer_type"]');
-  const className = await (await el.getProperty('className')).jsonValue();
-
-  // Navigating to the liberty site
-  className == 'col-sm-6 col-xs-6 nav-link nav-parts danger'
-    ? process.exit(1)
-    : await page.goto('https://www.libertyhomeguard.com/', {
-        waitUntil: 'networkidle2',
-      });
-
-  // Filling in the zip code
-  await page.type('#zipcode_start', zip);
   await page.keyboard.press('Enter');
 
   // Google sheets initialization
@@ -65,7 +57,9 @@ const proxyDetails = require('./utils/proxy');
   const rows = await sheet.getRows();
   const rowNumber = sheet.rowCount;
 
-  console.log(rowNumber);
+  //   console.log(rows[1].status); // undefined if it is empty
+
+  //   console.log(rowNumber);
 
   const random = Math.floor(Math.random() * rowNumber);
 
@@ -81,16 +75,16 @@ const proxyDetails = require('./utils/proxy');
   ) => {
     for (let i = 0; i < arr.length; i++) {
       switch (arr[i]) {
-        case '#f_name':
+        case '#fname':
           await page.type(arr[i], first_name);
           break;
-        case '#l_name':
+        case '#lname':
           await page.type(arr[i], last_name);
           break;
-        case '#email_id':
+        case '#email':
           await page.type(arr[i], email);
           break;
-        case '#phone_number':
+        case '#phone':
           await page.type(arr[i], phone);
           break;
       }
@@ -98,35 +92,42 @@ const proxyDetails = require('./utils/proxy');
   };
 
   // Inserting the data from google sheets to the form
-  try {
-    await waitingForSelectors([
-      '#f_name',
-      '#l_name',
-      '#email_id',
-      '#phone_number',
-    ]);
+  const dataArr = rows[random]._rawData;
+
+  const tabs = await browser.pages().length;
+  console.log(tabs);
+
+  let usedArray = [];
+  usedArray.push(rows[random]);
+
+  if (dataArr[4] === undefined) {
+    await waitingForSelectors(['#fname', '#lname', '#email', '#phone']);
 
     await fillingTheForm(
-      ['#f_name', '#l_name', '#email_id', '#phone_number'],
+      ['#fname', '#lname', '#email', '#phone'],
       rows[random]
     );
-  } catch (err) {
-    throw new Error(err);
+
+    await page.click('[type="submit"]');
+
+    if (await page.$('#success')) {
+      dataArr[4] = 'SUCCESS';
+      rows[random].save();
+    } else {
+      dataArr[4] = 'FAIL';
+      rows[random].save();
+    }
+  } else if (dataArr[4] === 'SUCCESS' || dataArr[4] === 'FAIL') {
+    console.error('User has been registered already');
+  } else if (dataArr[4] !== undefined) {
+    console.error('User has been registered');
+  } else if (dataArr === undefined) {
+    console.error('User already with status');
   }
 
-  // Clicking continue
-  await page.click('#steponebtn');
-
-  if (
-    page.url !== 'https://www.libertyhomeguard.com/checkout/' &&
-    page.url !== 'https://www.libertyhomeguard.com/'
-  ) {
-    rows[random].status = 'SUCCEED';
-    rows[random].save();
-  } else {
-    rows[random].status = 'FAILED';
-    rows[random].save();
+  if (handler) {
+    setTimeout(async () => {
+      await browser.close();
+    }, 10000);
   }
-
-  // browser.close();
 })().catch((e) => console.error(e));

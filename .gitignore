@@ -1,2 +1,7 @@
 node_modules
 config
+.env
+credentials.json
+vips-residential-updated.txt
+dist
+.vscode
