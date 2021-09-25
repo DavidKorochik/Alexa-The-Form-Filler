@@ -1,8 +1,9 @@
 const pageView = require('../utils/pageView');
+require('dotenv').config();
 
 // Array of the sites we want to send the request to
 const sites = [
-  'http://ausettler.com/test/form.php',
+  process.env.AUSETTLER_ROUTE,
   'https://www.instagram.com/?hl=en',
   'https://sequelize.org/',
   'https://github.com/',

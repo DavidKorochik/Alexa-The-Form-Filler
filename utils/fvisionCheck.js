@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fvisionCheck = async (page) => {
   await page.goto('http://f.vision/'); // Navigating to the f.vision site to check if there is any proxy error
 
@@ -12,7 +14,7 @@ const fvisionCheck = async (page) => {
   // Navigating to the liberty site
   className == 'col-sm-6 col-xs-6 nav-link nav-parts danger'
     ? process.exit(1)
-    : await page.goto('http://ausettler.com/test/form.php', {
+    : await page.goto(process.env.AUSETTLER_ROUTE, {
         waitUntil: 'networkidle2',
       });
 };
