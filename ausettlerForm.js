@@ -14,7 +14,7 @@ require('dotenv').config();
 (async () => {
   const zip = '77584'; // Zip code for the site
   let count = null; // Views counter
-  const proxyFile = 'vips-residential-updated.txt'; // Proxy details file
+  // const proxyFile = 'vips-residential-updated.txt'; // Proxy details file
 
   // Database connection function @ ./db/mongoose.js
   db();
@@ -50,9 +50,6 @@ require('dotenv').config();
 
   // Navigating to the form
   await page.goto('http://ausettler.com/test/form.php');
-
-  // Executing the page view function @ ./utils/pageViews.js
-  await pageView(browser);
 
   // Counting the views each execution
   count += 8;
